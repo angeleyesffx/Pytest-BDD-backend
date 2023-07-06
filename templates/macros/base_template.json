@@ -1,0 +1,38 @@
+{% macro create_nested_body(keys_name, body) %}
+[
+{% for dictionary in dict_list -%}
+    {% set new_dictionary = {} %}
+    {% set list_of_dicts = [] %}
+    {% set new_dictionary = {} %}
+    {% for item in keys_name %}
+        {% for key,value in dictionary.items() %}
+            {% if key.startswith(item)%}
+                {% if value|length %}
+                   {% set _= new_dictionary.__setitem__(key, value) %}
+                {% endif %}
+           {% endif %}
+        {% endfor %}
+    {% endfor %}
+    {% if new_dictionary|length %}
+        {{ list_of_dicts.append(new_dictionary) or "" }}
+    {% endif %}
+    {% include body %}
+{% if loop.last %}{% else %}, {% endif %}{% endfor %}
+]
+{%- endmacro %}
+
+{% macro create_body(keys_name, body) %}
+    {% set dictionary = dict_list.pop(0) %}
+    {% set new_dictionary = {} %}
+    {% set new_dictionary = {} %}
+    {% for item in keys_name %}
+        {% for key,value in dictionary.items() %}
+            {% if key.startswith(item)%}
+                {% if value|length %}
+                   {% set _= new_dictionary.__setitem__(key, value) %}
+                {% endif %}
+           {% endif %}
+        {% endfor %}
+    {% endfor %}
+    {% include body %}
+{%- endmacro %}
