@@ -1,0 +1,15 @@
+selenium
+requests
+pytest
+pytest_bdd
+pytest-env
+pytest-asyncio
+Selenium-Screenshot
+PyYaml
+pandas
+jinja2
+pymongo
+pymongo[srv]
+pillow>=9.0.0 
+numpy>=1.22.0
+faker
