@@ -1,7 +1,7 @@
 import os
 import json
 import jinja2
-from tests.features.commons.csvDataBuilder import select_csv_strategy
+from tests.features.commons.csvBuilder import select_csv_strategy
 from tests.features.commons.stringManipulation import split_string_after
 from tests.features.environment import get_execute_flag, get_data_param_keys
 
