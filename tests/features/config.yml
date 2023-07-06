@@ -1,0 +1,89 @@
+#EXAMPLE_CONFIG
+#----------------------------------------------------------------------------------------------------------------------#
+sit:
+  base_url: https://services-sit.bees-platform.dev
+  countries:
+    br:
+      middleware_api_auth_type: Bearer
+      middleware_api_auth_token: access_token
+      middleware_api_auth_method: post
+      middleware_api_auth_url: https://services-sit.com/api/auth/token
+      middleware_api_auth_grant_type: client_credentials
+      middleware_api_auth_client_id:
+      middleware_api_auth_scope: openid
+      middleware_api_auth_client_secret:
+      middleware_api_vendor_id:
+      timezone: America/Louisville
+      services:
+        register:
+          get:
+            request_through_middleware_api: false
+            auth_method: post
+            auth_type: Bearer
+            auth_token: access_token
+            auth_url: https://login_sit.com/oauth2/v2.0/token
+            auth_grant_type: client_credentials
+            auth_client_id:
+            auth_scope:
+            auth_client_secret:
+            vendor_id:
+            traceIdPerRequest: true
+            versions:
+              v1:
+                url: /api/middleware-service/v1
+                value_stream_url: /register/v1/
+                amount_data_mass: 1
+                encoding_type: utf-8
+                id_prefix: QA-LAZY
+                csv_data_source: non_nested
+                template_name: config_templates/non_nested
+                multiple_request: false
+          post:
+            auth_type: Bearer
+            auth_token: access_token
+            auth_method: post
+            auth_url: https://login_sit.com/oauth2/v2.0/token
+            auth_grant_type: client_credentials
+            auth_client_id:
+            auth_scope: openid
+            auth_client_secret:
+            auth_vendor_id:
+            request_through_middleware_api: true
+            traceIdPerRequest: true
+            versions:
+              v1:
+                url: /api/middleware-service/v1
+                value_stream_url: /v1/register
+                amount_data_mass: 1
+                encoding_type: utf-8
+                id_prefix: QA-LAZY
+                csv_strategy: mixed_random_csv
+                param_keys: "tax_id:cnpj, owner_email:email, owner_first_name:first_name,owner_last_name:last_name,sales_representative_email:email, sales_representative_phone:phone, fullname:name, delivery_address:address,delivery_zipcode:zipcode,delivery_schedule_id:id6,liquor_license_expiration_date:expirationDate30"
+                template_name: config_templates/nested
+                multiple_request: false
+        stores_inventory:
+          post:
+            request_through_middleware_api: false
+            auth_type: Bearer
+            auth_token: access_token
+            auth_method: post
+            auth_url:
+            auth_grant_type: client_credentials
+            auth_client_id:
+            auth_scope: openid
+            auth_client_secret:
+            auth_vendor_id:
+            traceIdPerRequest: true
+            versions:
+              v1:
+                url: /api/middleware-service/v1
+                value_stream_url: /v1/stores/$store_id/inventory/$item
+                amount_data_mass: 1
+                encoding_type: utf-8
+                id_prefix: QA-LAZY
+                csv_data_source:
+                csv_strategy: single_line
+                param_keys: "item:id8"
+                multiple_request: true
+#----------------------------------------------------------------------------------------------------------------------#
+#EXAMPLE_CONFIG
