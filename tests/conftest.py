@@ -44,7 +44,7 @@ class Config(object):
 def pytest_addoption(parser):
     parser.addoption("--config_yaml", action="store", default="config",
                      help="The configuration file to be used for the tests")
-    parser.addoption("--env", action="store", default="sit",
+    parser.addoption("--environment", action="store", default="sit",
                      help="The configuration of the environment to be used for the tests")
 
 
