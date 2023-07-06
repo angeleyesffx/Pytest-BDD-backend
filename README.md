@@ -156,7 +156,7 @@ To print output execute the command line:
 Example:
 
 
-*   `pytest --rootdir=./ -rP -v tests/features/steps/your_steps.py -capture=no -D environment=desenv -D browser=firefox --tags=@wip`
+*   `pytest --rootdir=./ -rP -v tests/features/steps/your_steps.py -capture=no --environment=desenv --browser=firefox --tags=@wip`
  
 
 
