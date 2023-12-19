@@ -1,7 +1,7 @@
 #EXAMPLE_CONFIG
 #----------------------------------------------------------------------------------------------------------------------#
 sit:
-  base_url: https://services-sit.bees-platform.dev
+  base_url: https://services-sit.com
   countries:
     br:
       middleware_api_auth_type: Bearer
