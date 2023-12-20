@@ -1,10 +1,13 @@
 import json
 import csv
-import os
 import pandas as pd
+import os
 import datetime
+import contextlib
+
 from tests.features.commons.utils import delete_file, create_folder
 from tests.features.environment import get_data_param_keys
+
 
 
 # ---------------------------------------------------------------------------------------------------------------------#
@@ -25,6 +28,7 @@ def normalize(payload, expand_all=False):
     while expand_all and df.applymap(type).astype(str).eq("<class 'list'>").any(axis=1).all() or df.applymap(type).astype(str).eq("<class 'dict'>").any(axis=1).all():
         df = normalize(df.to_dict("records"))
     return df
+
 
 
 def write_responses_in_csv(response, request_name, param_keys, multiple_request, request_through_generic_relay):
@@ -71,8 +75,8 @@ def write_responses_in_csv(response, request_name, param_keys, multiple_request,
 
 def csv_writer(file_path, payload):
     df = normalize(payload, expand_all=True)
-    df = df.set_index('requestTraceId')
-    df.to_csv(file_path, mode='a')
+    df = df.set_index("requestTraceId")
+    df.to_csv(file_path, mode='a', header=not os.path.exists(file_path))
 
 
 
@@ -96,21 +100,22 @@ def load_csv(csv_file_path):
     :return:
     """
     new_json = []
-    with open(csv_file_path, mode='r', encoding="utf8") as csv_file:
+    with contextlib.closing(open(csv_file_path, mode='r', encoding="utf8")) as csv_file:
         csv_reader = csv.DictReader(csv_file)
         for row in csv_reader:
             new_json.append(json.dumps(row, sort_keys=True))
     return new_json
 
 
-def load_csv_and_param_keys(csv_file_path, param_keys):
-    new_json = []
-    with open(csv_file_path, mode='r', encoding="utf8") as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        for row in csv_reader:
-            row.update(param_keys)
-            new_json.append((json.dumps(row, sort_keys=True)))
-    return new_json
+def load_csv_and_param_keys(country, csv_file_path, params_keys, static_params, prefix):
+        new_json = []
+        with contextlib.closing(open(csv_file_path, mode='r', encoding="utf8")) as csv_file:
+            csv_reader = csv.DictReader(csv_file)
+            for row in csv_reader:
+                param_keys = get_data_param_keys(country, params_keys, static_params, prefix)
+                row.update(param_keys)
+                new_json.append((json.dumps(row, sort_keys=True)))
+        return new_json
 
 
 def load_csv_multiple_lines(csv_file, group_key, output_list_name, list_fields):
@@ -145,7 +150,7 @@ def load_csv_multiple_lines(csv_file, group_key, output_list_name, list_fields):
     :return:
     """
     result = {}
-    with open(csv_file, 'r', encoding="utf8") as fh:
+    with contextlib.closing(open(csv_file, 'r', encoding="utf8")) as fh:
         csv_reader = csv.DictReader(fh)
         for row in csv_reader:
             group_key_joined = get_group_key(row, group_key)
@@ -182,7 +187,7 @@ def get_scenario_data_csv(csv_file_path, test_scenario_id):
     :return:
     """
     new_json = []
-    with open(csv_file_path, mode='r', encoding="utf8") as csv_file:
+    with contextlib.closing(open(csv_file_path, mode='r', encoding="utf8")) as csv_file:
         csv_reader = csv.DictReader(csv_file)
         for row in csv_reader:
             if test_scenario_id == row["test_scenario_id"]:
@@ -210,14 +215,14 @@ def get_each_line_data_csv(csv_file_path):
     :return:
     """
     new_json = []
-    with open(csv_file_path, mode='r', encoding="utf8") as csv_file:
+    with contextlib.closing(open(csv_file_path, mode='r', encoding="utf8")) as csv_file:
         csv_reader = csv.DictReader(csv_file)
         for row in csv_reader:
             new_json.append(json.dumps(row, sort_keys=True))
     return new_json
 
 
-def select_csv_strategy(csv_file_name, strategy, scenario=None, params_keys=None):
+def select_csv_strategy(country, csv_file_name, strategy, scenario=None, params_keys=None, static_params=None, prefix=None):
     cvs_file = os.path.join(os.getcwd(), "datasource", csv_file_name + ".csv")
     if os.path.exists(cvs_file):
         if str(strategy) == "scenario_line":
@@ -227,7 +232,7 @@ def select_csv_strategy(csv_file_name, strategy, scenario=None, params_keys=None
         elif str(strategy) == "all_in":
             csv_data = load_csv(cvs_file)
         elif str(strategy) == "mixed_random_csv":
-            csv_data = load_csv_and_param_keys(cvs_file, params_keys)
+            csv_data = load_csv_and_param_keys(country, cvs_file, params_keys, static_params, prefix)
         else:
             csv_data = load_csv(cvs_file)
         return csv_data
