@@ -1,8 +1,7 @@
 import os
 import yaml
 import pytest
-from tests.features.commons.utils import random_data_generator
-import random
+
 
 
 class Config(object):
@@ -44,14 +43,14 @@ class Config(object):
 def pytest_addoption(parser):
     parser.addoption("--config_yaml", action="store", default="config",
                      help="The configuration file to be used for the tests")
-    parser.addoption("--environment", action="store", default="sit",
+    parser.addoption("--environment", action="store", default="qa",
                      help="The configuration of the environment to be used for the tests")
 
 
 @pytest.fixture
 def set_up_environment(request):
     config_yaml_name = request.config.getoption("--config_yaml")
-    env = request.config.getoption("--env")
+    env = request.config.getoption("--environment")
     config_data = select_the_config_file(config_yaml_name)
     config_env = select_the_environment(env, config_data)
     return config_env
