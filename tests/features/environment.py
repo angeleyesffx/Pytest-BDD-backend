@@ -1,7 +1,7 @@
 from random import random
 
 from tests.conftest import Config
-from tests.features.commons.utils import random_data_generator
+from tests.features.commons.randomGenerator import random_data_generator
 
 
 def get_execute_flag():
@@ -124,10 +124,10 @@ def get_auth_client_secret(environment, country, service, method):
 
 def get_url(environment, country, service, method, version):
     if is_request_through_middleware_api(environment, country, service, method):
-        url = Config.get_config_from_version(environment, country, service, method, version, "url")
+        url = Config.get_config_from_version(environment, country, service, method, version, "middleware_url")
         return url
     else:
-        url = Config.get_config_from_version(environment, country, service, method, version, "value_stream_url")
+        url = Config.get_config_from_version(environment, country, service, method, version, "url")
         return url
 
 
