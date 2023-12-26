@@ -1,4 +1,4 @@
 {% import 'macros/base_template.json' as base with context %}
-{% set keys_name = ["country","delivery_address","contact_type","contact_value","product_id","description","quantity"] %}
+{% set keys_name = ["country","address","contact_type","contact_value","product_id","description","quantity"] %}
 {% set body ="bodies/non_nested_template.json" %}
 {{ base.create_body(keys_name, body) }}
