@@ -4,20 +4,14 @@ import os
 import time
 import calendar
 import io
-import uuid
 import zlib
 import requests
 from string import Template
 from functools import reduce
-
-from pandas._libs.tslibs.timezones import get_timezone
-
+import concurrent.futures
 from tests.features.commons.jsonBuilder import write_json_file
-from tests.features.commons.payloadBuilder import create_payload, create_generic_relay_payload, data_and_header_creation
 from tests.features.commons.csvBuilder import write_responses_in_csv
-from tests.features.environment import get_execute_flag, get_id_prefix, get_zip_payload, get_amount_data_mass, \
-    get_base_url, is_request_through_generic_relay, get_auth_token, get_auth_type, get_auth_payload, get_auth_method, \
-    get_auth_url
+from tests.features.environment import get_execute_flag
 
 
 def response_from_auth(method, url, payload):
@@ -76,13 +70,15 @@ def get_access_token(key, method, url, payload):
         return str(token)
 
 
-def create_header(data_header, auth_url, auth_method, auth_type, auth_payload, token, request_trace_id, auth_header=None, zip_payload_needed=None):
+def create_header(data_header, auth_url, auth_method, auth_type, auth_payload, token, request_trace_id,
+                  auth_header=None, zip_payload_needed=None):
     new_header = []
     new_token = select_token_type(auth_url, auth_method, auth_type, auth_payload, token)
     content_encoding = "gzip" if zip_payload_needed else ""
+    new_auth = "{} {}".format(auth_type, new_token) if auth_type else new_token
     headers = {
         "requestTraceId": request_trace_id,
-        "Authorization": "{} {}".format(auth_type, new_token),
+        "Authorization": new_auth,
         "Content-Type": "application/json",
         "accept": "application/json",
         "x-timestamp": str(calendar.timegm(time.gmtime())),
@@ -107,7 +103,8 @@ def zip_payload(payload: str) -> bytes:
     return file.getvalue()
 
 
-def send_request(request_name, method, url, headers, payload, data, multiple_request=False, request_through_middleware_api=False,
+def send_request(request_name, method, url, headers, payload, data, multiple_request=False,
+                 request_through_middleware_api=False,
                  zip_payload_needed=None):
     if multiple_request and type(payload) is list:
         payload = [zip_payload(body) if zip_payload_needed else body for body in payload]
@@ -190,6 +187,7 @@ def evaluate_response(payload, responses, request_name, multiple_request=False, 
     else:
         print_result(payload, responses, request_name, multiple_request, request_through_middleware_api)
     return payload
+
 
 def print_request_and_exit(request_name, method, url, headers, body_request, zip_payload_needed):
     print('\n\n\t*************************** DEBUG MODE *******************************')
